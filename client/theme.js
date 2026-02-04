@@ -1,7 +1,7 @@
-import { createMuiTheme } from '@material-ui/core/styles'
-import { teal, orange } from '@material-ui/core/colors'
+import { createTheme } from '@mui/material/styles'
+import { teal, orange } from '@mui/material/colors'
 
-const theme = createMuiTheme({
+const theme = createTheme({
     palette: {
       primary: {
       light: '#52c7b8',
@@ -17,8 +17,8 @@ const theme = createMuiTheme({
     },
       openTitle: teal['700'],
       protectedTitle: orange['700'],
-      type: 'light'
+      mode: 'light'
     }
   })
 
-  export default theme  
+  export default theme
