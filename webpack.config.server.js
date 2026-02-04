@@ -22,9 +22,19 @@ const config = {
             },
             {
                 test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
-                use: 'file-loader'
+                type: 'asset/resource',
+                generator: {
+                    filename: '[name][ext]'
+                }
             }
         ]
+    },
+    output: {
+        path: path.join(CURRENT_WORKING_DIR , '/dist/'),
+        filename: "server.generated.js",
+        publicPath: '/dist/',
+        libraryTarget: "commonjs2",
+        hashFunction: 'xxhash64'
     }
 }
 

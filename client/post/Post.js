@@ -13,44 +13,11 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 import CommentIcon from '@mui/icons-material/Comment'
 import Divider from '@mui/material/Divider'
 import PropTypes from 'prop-types'
-import {makeStyles} from '@mui/styles'
 import {Link} from 'react-router-dom'
 import {remove, like, unlike} from './api-post.js'
 import Comments from './Comments'
 
-const useStyles = makeStyles(theme => ({
-  card: {
-    maxWidth:600,
-    margin: 'auto',
-    marginBottom: theme.spacing(3),
-    backgroundColor: 'rgba(0, 0, 0, 0.06)'
-  },
-  cardContent: {
-    backgroundColor: 'white',
-    padding: `${theme.spacing(2)}px 0px`
-  },
-  cardHeader: {
-    paddingTop: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
-  },
-  text: {
-    margin: theme.spacing(2)
-  },
-  photo: {
-    textAlign: 'center',
-    backgroundColor: '#f2f5f4',
-    padding:theme.spacing(1)
-  },
-  media: {
-    height: 200
-  },
-  button: {
-   margin: theme.spacing(1),
-  }
-}))
-
 export default function Post (props){
-  const classes = useStyles()
   const jwt = auth.isAuthenticated()
   const checkLike = (likes) => {
     let match = likes.indexOf(jwt.user._id) !== -1
@@ -102,7 +69,7 @@ export default function Post (props){
   }
 
     return (
-      <Card className={classes.card}>
+      <Card sx={{ maxWidth: 600, margin: 'auto', marginBottom: 3, backgroundColor: 'rgba(0, 0, 0, 0.06)' }}>
         <CardHeader
             avatar={
               <Avatar src={'/api/users/photo/'+props.post.postedBy._id}/>
@@ -114,29 +81,29 @@ export default function Post (props){
             }
             title={<Link to={"/user/" + props.post.postedBy._id}>{props.post.postedBy.name}</Link>}
             subheader={(new Date(props.post.created)).toDateString()}
-            className={classes.cardHeader}
+            sx={{ paddingTop: 1, paddingBottom: 1 }}
           />
-        <CardContent className={classes.cardContent}>
-          <Typography component="p" className={classes.text}>
+        <CardContent sx={{ backgroundColor: 'white', padding: '16px 0px' }}>
+          <Typography component="p" sx={{ margin: 2 }}>
             {props.post.text}
           </Typography>
           {props.post.photo &&
-            (<div className={classes.photo}>
+            (<div sx={{ textAlign: 'center', backgroundColor: '#f2f5f4', padding: 1 }}>
               <img
-                className={classes.media}
+                sx={{ height: 200 }}
                 src={'/api/posts/photo/'+props.post._id}
                 />
             </div>)}
         </CardContent>
         <CardActions>
           { values.like
-            ? <IconButton onClick={clickLike} className={classes.button} aria-label="Like" color="secondary">
+            ? <IconButton onClick={clickLike} sx={{ margin: 1 }} aria-label="Like" color="secondary">
                 <FavoriteIcon />
               </IconButton>
-            : <IconButton onClick={clickLike} className={classes.button} aria-label="Unlike" color="secondary">
+            : <IconButton onClick={clickLike} sx={{ margin: 1 }} aria-label="Unlike" color="secondary">
                 <FavoriteBorderIcon />
               </IconButton> } <span>{values.likes}</span>
-              <IconButton className={classes.button} aria-label="Comment" color="secondary">
+              <IconButton sx={{ margin: 1 }} aria-label="Comment" color="secondary">
                 <CommentIcon/>
               </IconButton> <span>{values.comments.length}</span>
         </CardActions>

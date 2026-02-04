@@ -9,7 +9,8 @@ const config = {
     output: {
         path: path.join(CURRENT_WORKING_DIR , '/dist'),
         filename: 'bundle.js',
-        publicPath: "/dist/"
+        publicPath: "/dist/",
+        hashFunction: 'xxhash64'
     },
     module: {
         rules: [
@@ -22,7 +23,10 @@ const config = {
             },
             {
                 test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
-                type: 'asset/resource'
+                type: 'asset/resource',
+                generator: {
+                    filename: '[name][ext]'
+                }
             }
         ]
     }

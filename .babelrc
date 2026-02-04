@@ -11,7 +11,12 @@
       "runtime": "automatic"
     }]
   ],
-  "plugins": [
-    "react-refresh/babel"
-  ]
+  "plugins": [],
+  "env": {
+    "development-client": {
+      "plugins": [
+        ["react-refresh/babel", { "skipEnvCheck": true }]
+      ]
+    }
+  }
 }

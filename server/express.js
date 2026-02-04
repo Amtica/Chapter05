@@ -5,6 +5,7 @@ import compress from 'compression'
 import cors from 'cors'
 import helmet from 'helmet'
 import Template from './../template'
+import config from './../config/config'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
 import postRoutes from './routes/post.routes'
@@ -38,7 +39,17 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(compress())
 // secure apps by setting various HTTP headers
-app.use(helmet())
+if (config.env === 'development') {
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        scriptSrc: ["'self'", "'unsafe-eval'"]
+      }
+    }
+  }))
+} else {
+  app.use(helmet())
+}
 // enable CORS - Cross Origin Resource Sharing
 app.use(cors())
 
@@ -49,8 +60,8 @@ app.use('/', userRoutes)
 app.use('/', authRoutes)
 app.use('/', postRoutes)
 
-app.get('*', (req, res) => {
-  const cache = createCache({ key: 'css' })
+app.use((req, res) => {
+  const cache = createCache({ key: 'css', prepend: true })
   const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache)
   
   const context = {}

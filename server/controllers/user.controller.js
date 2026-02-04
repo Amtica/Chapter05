@@ -1,7 +1,7 @@
 import User from '../models/user.model'
 import extend from 'lodash/extend'
 import errorHandler from './../helpers/dbErrorHandler'
-import formidable from 'formidable'
+import { IncomingForm } from 'formidable'
 import fs from 'fs'
 import profileImage from './../../client/assets/images/profile-pic.png'
 
@@ -28,13 +28,13 @@ const userByID = async (req, res, next, id) => {
     .populate('followers', '_id name')
     .exec()
     if (!user)
-      return res.status('400').json({
+      return res.status(400).json({
         error: "User not found"
       })
     req.profile = user
     next()
   } catch (err) {
-    return res.status('400').json({
+    return res.status(400).json({
       error: "Could not retrieve user"
     })
   }
@@ -58,7 +58,7 @@ const list = async (req, res) => {
 }
 
 const update = (req, res) => {
-  let form = new formidable.IncomingForm()
+  let form = new IncomingForm()
   form.keepExtensions = true
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -66,12 +66,21 @@ const update = (req, res) => {
         error: "Photo could not be uploaded"
       })
     }
+    // Convert formidable v3 array fields to single values
+    const processedFields = {}
+    for (const [key, value] of Object.entries(fields)) {
+      processedFields[key] = Array.isArray(value) ? value[0] : value
+    }
+    
     let user = req.profile
-    user = extend(user, fields)
+    user = extend(user, processedFields)
     user.updated = Date.now()
     if(files.photo){
-      user.photo.data = fs.readFileSync(files.photo.path)
-      user.photo.contentType = files.photo.type
+      const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo
+      if (photoFile && photoFile.filepath) {
+        user.photo.data = fs.readFileSync(photoFile.filepath)
+        user.photo.contentType = photoFile.mimetype
+      }
     }
     try {
       await user.save()
@@ -89,10 +98,10 @@ const update = (req, res) => {
 const remove = async (req, res) => {
   try {
     let user = req.profile
-    let deletedUser = await user.remove()
-    deletedUser.hashed_password = undefined
-    deletedUser.salt = undefined
-    res.json(deletedUser)
+    await user.deleteOne()
+    user.hashed_password = undefined
+    user.salt = undefined
+    res.json(user)
   } catch (err) {
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err)

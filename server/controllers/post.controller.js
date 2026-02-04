@@ -1,10 +1,10 @@
 import Post from '../models/post.model'
 import errorHandler from './../helpers/dbErrorHandler'
-import formidable from 'formidable'
+import { IncomingForm } from 'formidable'
 import fs from 'fs'
 
 const create = (req, res, next) => {
-  let form = new formidable.IncomingForm()
+  let form = new IncomingForm()
   form.keepExtensions = true
   form.parse(req, async (err, fields, files) => {
     if (err) {
@@ -12,11 +12,20 @@ const create = (req, res, next) => {
         error: "Image could not be uploaded"
       })
     }
-    let post = new Post(fields)
+    // Convert formidable v3 array fields to single values
+    const processedFields = {}
+    for (const [key, value] of Object.entries(fields)) {
+      processedFields[key] = Array.isArray(value) ? value[0] : value
+    }
+    
+    let post = new Post(processedFields)
     post.postedBy= req.profile
     if(files.photo){
-      post.photo.data = fs.readFileSync(files.photo.path)
-      post.photo.contentType = files.photo.type
+      const photoFile = Array.isArray(files.photo) ? files.photo[0] : files.photo
+      if (photoFile && photoFile.filepath) {
+        post.photo.data = fs.readFileSync(photoFile.filepath)
+        post.photo.contentType = photoFile.mimetype
+      }
     }
     try {
       let result = await post.save()
@@ -33,13 +42,13 @@ const postByID = async (req, res, next, id) => {
   try{
     let post = await Post.findById(id).populate('postedBy', '_id name').exec()
     if (!post)
-      return res.status('400').json({
+      return res.status(400).json({
         error: "Post not found"
       })
     req.post = post
     next()
   }catch(err){
-    return res.status('400').json({
+    return res.status(400).json({
       error: "Could not retrieve use post"
     })
   }
@@ -80,8 +89,8 @@ const listNewsFeed = async (req, res) => {
 const remove = async (req, res) => {
   let post = req.post
   try{
-    let deletedPost = await post.remove()
-    res.json(deletedPost)
+    await post.deleteOne()
+    res.json(post)
   }catch(err){
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err)
@@ -149,7 +158,7 @@ const uncomment = async (req, res) => {
 const isPoster = (req, res, next) => {
   let isPoster = req.post && req.auth && req.post.postedBy._id == req.auth._id
   if(!isPoster){
-    return res.status('403').json({
+    return res.status(403).json({
       error: "User is not authorized"
     })
   }

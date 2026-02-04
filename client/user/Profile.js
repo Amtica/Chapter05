@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import {makeStyles} from '@mui/styles'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -19,28 +18,8 @@ import FollowProfileButton from './../user/FollowProfileButton'
 import ProfileTabs from './../user/ProfileTabs'
 import {listByUser} from './../post/api-post.js'
 
-const useStyles = makeStyles(theme => ({
-  root: theme.mixins.gutters({
-    maxWidth: 600,
-    margin: 'auto',
-    padding: theme.spacing(3),
-    marginTop: theme.spacing(5)
-  }),
-  title: {
-    margin: `${theme.spacing(2)}px ${theme.spacing(1)}px 0`,
-    color: theme.palette.protectedTitle,
-    fontSize: '1em'
-  },
-  bigAvatar: {
-    width: 60,
-    height: 60,
-    margin: 10
-  }
-}))
-
 export default function Profile() {
   const { userId } = useParams()
-  const classes = useStyles()
   const [values, setValues] = useState({
     user: {following:[], followers:[]},
     redirectToSignin: false,
@@ -116,14 +95,14 @@ export default function Profile() {
       return <Navigate to='/signin' replace />
     }
     return (
-      <Paper className={classes.root} elevation={4}>
-        <Typography variant="h6" className={classes.title}>
+      <Paper sx={{ maxWidth: 600, margin: 'auto', padding: 3, marginTop: 5 }} elevation={4}>
+        <Typography variant="h6" sx={{ margin: '16px 8px 0', color: 'primary.main', fontSize: '1em' }}>
           Profile
         </Typography>
         <List dense>
           <ListItem>
             <ListItemAvatar>
-              <Avatar src={photoUrl} className={classes.bigAvatar}/>
+              <Avatar src={photoUrl} sx={{ width: 60, height: 60, margin: 1 }}/>
             </ListItemAvatar>
             <ListItemText primary={values.user.name} secondary={values.user.email}/> {
              auth.isAuthenticated().user && auth.isAuthenticated().user._id == values.user._id
