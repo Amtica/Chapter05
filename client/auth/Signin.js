@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import { useState } from 'react'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography'
 import Icon from '@mui/material/Icon'
 import { makeStyles } from '@mui/styles'
 import auth from './../auth/auth-helper'
-import {Redirect} from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import {signin} from './api-auth.js'
 
 const useStyles = makeStyles(theme => ({
@@ -37,8 +37,9 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function Signin(props) {
+export default function Signin() {
   const classes = useStyles()
+  const location = useLocation()
   const [values, setValues] = useState({
       email: '',
       password: '',
@@ -67,14 +68,14 @@ export default function Signin(props) {
     setValues({ ...values, [name]: event.target.value })
   }
 
-  const {from} = props.location.state || {
+  const {from} = location.state || {
       from: {
         pathname: '/'
       }
   }
   const {redirectToReferrer} = values
     if (redirectToReferrer) {
-      return (<Redirect to={from}/>)
+      return (<Navigate to={from} replace />)
   }
 
   return (

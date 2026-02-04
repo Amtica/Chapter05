@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react'
-import {makeStyles} from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemAvatar from '@material-ui/core/ListItemAvatar'
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction' 
-import ListItemText from '@material-ui/core/ListItemText' 
-import Avatar from '@material-ui/core/Avatar'
-import IconButton from '@material-ui/core/IconButton'
-import Typography from '@material-ui/core/Typography'
+import { useState, useEffect } from 'react'
+import {makeStyles} from '@mui/styles'
+import Paper from '@mui/material/Paper'
+import List from '@mui/material/List'
+import ListItem from '@mui/material/ListItem'
+import ListItemAvatar from '@mui/material/ListItemAvatar'
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction' 
+import ListItemText from '@mui/material/ListItemText' 
+import Avatar from '@mui/material/Avatar'
+import IconButton from '@mui/material/IconButton'
+import Typography from '@mui/material/Typography'
 import Edit from '@mui/icons-material/Edit'
-import Divider from '@material-ui/core/Divider'
+import Divider from '@mui/material/Divider'
 import DeleteUser from './DeleteUser'
 import auth from './../auth/auth-helper'
 import {read} from './api-user.js'
-import {Redirect, Link} from 'react-router-dom'
+import { Navigate, Link, useParams } from 'react-router-dom'
 import FollowProfileButton from './../user/FollowProfileButton'
 import ProfileTabs from './../user/ProfileTabs'
 import {listByUser} from './../post/api-post.js'
@@ -38,7 +38,8 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function Profile({ match }) {
+export default function Profile() {
+  const { userId } = useParams()
   const classes = useStyles()
   const [values, setValues] = useState({
     user: {following:[], followers:[]},
@@ -53,7 +54,7 @@ export default function Profile({ match }) {
     const signal = abortController.signal
   
     read({
-      userId: match.params.userId
+      userId: userId
     }, {t: jwt.token}, signal).then((data) => {
       if (data && data.error) {
         setValues({...values, redirectToSignin: true})
@@ -67,7 +68,7 @@ export default function Profile({ match }) {
       abortController.abort()
     }
 
-  }, [match.params.userId])
+  }, [userId])
   
   const checkFollow = (user) => {
     const match = user.followers.some((follower)=> {
@@ -112,7 +113,7 @@ export default function Profile({ match }) {
               ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
               : '/api/users/defaultphoto'
     if (values.redirectToSignin) {
-      return <Redirect to='/signin'/>
+      return <Navigate to='/signin' replace />
     }
     return (
       <Paper className={classes.root} elevation={4}>

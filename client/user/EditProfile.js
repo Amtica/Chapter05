@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import { useEffect, useState } from 'react'
 import Card from '@mui/material/Card'
 import CardActions from '@mui/material/CardActions'
 import CardContent from '@mui/material/CardContent'
@@ -11,7 +11,7 @@ import FileUpload from '@mui/icons-material/AddPhotoAlternate'
 import { makeStyles } from '@mui/styles'
 import auth from './../auth/auth-helper'
 import {read, update} from './api-user.js'
-import {Redirect} from 'react-router-dom'
+import { Navigate, useParams } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -50,7 +50,8 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function EditProfile({ match }) {
+export default function EditProfile() {
+  const { userId } = useParams()
   const classes = useStyles()
   const [values, setValues] = useState({
     name: '',
@@ -69,7 +70,7 @@ export default function EditProfile({ match }) {
     const signal = abortController.signal
 
     read({
-      userId: match.params.userId
+      userId: userId
     }, {t: jwt.token}, signal).then((data) => {
       if (data & data.error) {
         setValues({...values, error: data.error})
@@ -81,7 +82,7 @@ export default function EditProfile({ match }) {
       abortController.abort()
     }
 
-  }, [match.params.userId])
+  }, [userId])
   
   const clickSubmit = () => {
     let userData = new FormData()
@@ -91,7 +92,7 @@ export default function EditProfile({ match }) {
     values.about && userData.append('about', values.about)
     values.photo && userData.append('photo', values.photo)
     update({
-      userId: match.params.userId
+      userId: userId
     }, {
       t: jwt.token
     }, userData).then((data) => {
@@ -113,7 +114,7 @@ export default function EditProfile({ match }) {
                  ? `/api/users/photo/${values.id}?${new Date().getTime()}`
                  : '/api/users/defaultphoto'
     if (values.redirectToProfile) {
-      return (<Redirect to={'/user/' + values.id}/>)
+      return (<Navigate to={'/user/' + values.id} replace />)
     }
     return (
       <Card className={classes.card}>
@@ -121,15 +122,15 @@ export default function EditProfile({ match }) {
           <Typography variant="h6" className={classes.title}>
             Edit Profile
           </Typography>
-          <Avatar src={photoUrl} className={classes.bigAvatar}/><br/>
-          <input accept="image/*" onChange={handleChange('photo')} className={classes.input} id="icon-button-file" type="file" />
+          <Avatar src={photoUrl} className={classes.bigAvatar}/ replace /><br/ replace />
+          <input accept="image/*" onChange={handleChange('photo')} className={classes.input} id="icon-button-file" type="file" / replace />
           <label htmlFor="icon-button-file">
             <Button variant="contained" color="default" component="span">
               Upload
-              <FileUpload/>
+              <FileUpload/ replace />
             </Button>
-          </label> <span className={classes.filename}>{values.photo ? values.photo.name : ''}</span><br/>
-          <TextField id="name" label="Name" className={classes.textField} value={values.name} onChange={handleChange('name')} margin="normal"/><br/>
+          </label> <span className={classes.filename}>{values.photo ? values.photo.name : ''}</span><br/ replace />
+          <TextField id="name" label="Name" className={classes.textField} value={values.name} onChange={handleChange('name')} margin="normal"/ replace /><br/ replace />
           <TextField
             id="multiline-flexible"
             label="About"
@@ -139,10 +140,10 @@ export default function EditProfile({ match }) {
             onChange={handleChange('about')}
             className={classes.textField}
             margin="normal"
-          /><br/>
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal"/><br/>
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal"/>
-          <br/> {
+          / replace /><br/ replace />
+          <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal"/ replace /><br/ replace />
+          <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal"/ replace />
+          <br/ replace /> {
             values.error && (<Typography component="p" color="error">
               <Icon color="error" className={classes.error}>error</Icon>
               {values.error}

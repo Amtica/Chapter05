@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 import IconButton from '@mui/material/IconButton'
 import Button from '@mui/material/Button'
@@ -10,7 +10,7 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import auth from './../auth/auth-helper'
 import {remove} from './api-user.js'
-import {Redirect, Link} from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 
 export default function DeleteUser(props) {
   const [open, setOpen] = useState(false)
@@ -37,7 +37,7 @@ export default function DeleteUser(props) {
   }
 
     if (redirect) {
-      return <Redirect to='/'/>
+      return <Navigate to='/' replace />
     }
     return (<span>
       <IconButton aria-label="Delete" onClick={clickButton} color="secondary">
