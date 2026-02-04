@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const CURRENT_WORKING_DIR = process.cwd()
 
 const config = {
@@ -21,24 +22,26 @@ const config = {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 use: [
-                    'babel-loader'
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            plugins: ['react-refresh/babel']
+                        }
+                    }
                 ]
             },
             {
                 test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
-                use: 'file-loader'
+                type: 'asset/resource'
             }
         ]
     },  
     plugins: [
           new webpack.HotModuleReplacementPlugin(),
-          new webpack.NoEmitOnErrorsPlugin()
-    ],
-    resolve: {
-        alias: {
-          'react-dom': '@hot-loader/react-dom'
-        }
-    }
+          new ReactRefreshWebpackPlugin({
+              overlay: false
+          })
+    ]
 }
 
 module.exports = config
