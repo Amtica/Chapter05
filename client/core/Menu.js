@@ -6,33 +6,37 @@ import IconButton from '@mui/material/IconButton'
 import HomeIcon from '@mui/icons-material/Home'
 import Button from '@mui/material/Button'
 import auth from './../auth/auth-helper'
-import {Link, withRouter} from 'react-router-dom'
+import {Link, useLocation, useNavigate} from 'react-router-dom'
 
-const isActive = (history, path) => {
-  if (history.location.pathname == path)
+const isActive = (location, path) => {
+  if (location.pathname == path)
     return {color: '#ffa726'}
   else
     return {color: '#ffffff'}
 }
-const Menu = withRouter(({history}) => (
+const Menu = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
+  
+  return (
   <AppBar position="static">
     <Toolbar>
       <Typography variant="h6" color="inherit">
         MERN Social
       </Typography>
       <Link to="/">
-        <IconButton aria-label="Home" style={isActive(history, "/")}>
+        <IconButton aria-label="Home" style={isActive(location, "/")} size="large">
           <HomeIcon/>
         </IconButton>
       </Link>
       {
         !auth.isAuthenticated() && (<span>
           <Link to="/signup">
-            <Button style={isActive(history, "/signup")}>Sign up
+            <Button style={isActive(location, "/signup")}>Sign up
             </Button>
           </Link>
           <Link to="/signin">
-            <Button style={isActive(history, "/signin")}>Sign In
+            <Button style={isActive(location, "/signin")}>Sign In
             </Button>
           </Link>
         </span>)
@@ -40,15 +44,15 @@ const Menu = withRouter(({history}) => (
       {
         auth.isAuthenticated() && (<span>
           <Link to={"/user/" + auth.isAuthenticated().user._id}>
-            <Button style={isActive(history, "/user/" + auth.isAuthenticated().user._id)}>My Profile</Button>
+            <Button style={isActive(location, "/user/" + auth.isAuthenticated().user._id)}>My Profile</Button>
           </Link>
           <Button color="inherit" onClick={() => {
-              auth.clearJWT(() => history.push('/'))
+              auth.clearJWT(() => navigate('/'))
             }}>Sign out</Button>
         </span>)
       }
     </Toolbar>
   </AppBar>
-))
+)}
 
 export default Menu

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import {makeStyles} from '@mui/material/styles'
+import {makeStyles} from '@mui/styles'
 import Paper from '@mui/material/Paper'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -14,20 +14,20 @@ import Divider from '@mui/material/Divider'
 import DeleteUser from './DeleteUser'
 import auth from './../auth/auth-helper'
 import {read} from './api-user.js'
-import {Redirect, Link} from 'react-router-dom'
+import {Navigate, Link, useParams} from 'react-router-dom'
 import FollowProfileButton from './../user/FollowProfileButton'
 import ProfileTabs from './../user/ProfileTabs'
 import {listByUser} from './../post/api-post.js'
 
 const useStyles = makeStyles(theme => ({
-  root: theme.mixins.gutters({
+  root: {
     maxWidth: 600,
     margin: 'auto',
     padding: theme.spacing(3),
     marginTop: theme.spacing(5)
-  }),
+  },
   title: {
-    margin: `${theme.spacing(2)}px ${theme.spacing(1)}px 0`,
+    margin: `${theme.spacing(2)} ${theme.spacing(1)} 0`,
     color: theme.palette.protectedTitle,
     fontSize: '1em'
   },
@@ -38,8 +38,9 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function Profile({ match }) {
+export default function Profile() {
   const classes = useStyles()
+  const { userId } = useParams()
   const [values, setValues] = useState({
     user: {following:[], followers:[]},
     redirectToSignin: false,
@@ -53,7 +54,7 @@ export default function Profile({ match }) {
     const signal = abortController.signal
   
     read({
-      userId: match.params.userId
+      userId: userId
     }, {t: jwt.token}, signal).then((data) => {
       if (data && data.error) {
         setValues({...values, redirectToSignin: true})
@@ -67,7 +68,7 @@ export default function Profile({ match }) {
       abortController.abort()
     }
 
-  }, [match.params.userId])
+  }, [userId])
   
   const checkFollow = (user) => {
     const match = user.followers.some((follower)=> {
@@ -112,7 +113,7 @@ export default function Profile({ match }) {
               ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
               : '/api/users/defaultphoto'
     if (values.redirectToSignin) {
-      return <Redirect to='/signin'/>
+      return <Navigate to='/signin'/>
     }
     return (
       <Paper className={classes.root} elevation={4}>

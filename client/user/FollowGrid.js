@@ -1,11 +1,11 @@
 import React from 'react'
-import {makeStyles} from '@mui/material/styles'
+import {makeStyles} from '@mui/styles'
 import PropTypes from 'prop-types'
 import Avatar from '@mui/material/Avatar'
 import Typography from '@mui/material/Typography'
 import {Link} from 'react-router-dom'
-import GridList from '@mui/material/GridList'
-import GridListTile from '@mui/material/GridListTile'
+import ImageList from '@mui/material/ImageList'
+import ImageListItem from '@mui/material/ImageListItem'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     height: 60,
     margin: 'auto'
   },
-  gridList: {
+  imageList: {
     width: 500,
     height: 220,
   },
@@ -33,16 +33,16 @@ const useStyles = makeStyles(theme => ({
 export default function FollowGrid (props) {
   const classes = useStyles()
     return (<div className={classes.root}>
-      <GridList cellHeight={160} className={classes.gridList} cols={4}>
+      <ImageList rowHeight={160} className={classes.imageList} cols={4}>
         {props.people.map((person, i) => {
-           return  <GridListTile style={{'height':120}} key={i}>
+           return  <ImageListItem style={{'height':120}} key={i}>
               <Link to={"/user/" + person._id}>
                 <Avatar src={'/api/users/photo/'+person._id} className={classes.bigAvatar}/>
                 <Typography className={classes.tileText}>{person.name}</Typography>
               </Link>
-            </GridListTile>
+            </ImageListItem>
         })}
-      </GridList>
+      </ImageList>
     </div>)
 }
 

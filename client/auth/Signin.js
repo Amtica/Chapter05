@@ -6,9 +6,9 @@ import Button from '@mui/material/Button'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import Icon from '@mui/material/Icon'
-import { makeStyles } from '@mui/material/styles'
+import { makeStyles } from '@mui/styles'
 import auth from './../auth/auth-helper'
-import {Redirect} from 'react-router-dom'
+import {Navigate, useLocation} from 'react-router-dom'
 import {signin} from './api-auth.js'
 
 const useStyles = makeStyles(theme => ({
@@ -39,6 +39,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function Signin(props) {
   const classes = useStyles()
+  const location = useLocation()
   const [values, setValues] = useState({
       email: '',
       password: '',
@@ -67,14 +68,10 @@ export default function Signin(props) {
     setValues({ ...values, [name]: event.target.value })
   }
 
-  const {from} = props.location.state || {
-      from: {
-        pathname: '/'
-      }
-  }
+  const from = location.state?.from?.pathname || '/'
   const {redirectToReferrer} = values
     if (redirectToReferrer) {
-      return (<Redirect to={from}/>)
+      return (<Navigate to={from}/>)
   }
 
   return (

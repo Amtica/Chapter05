@@ -8,10 +8,10 @@ import Typography from '@mui/material/Typography'
 import Icon from '@mui/material/Icon'
 import Avatar from '@mui/material/Avatar'
 import FileUpload from '@mui/icons-material/AddPhotoAlternate'
-import { makeStyles } from '@mui/material/styles'
+import { makeStyles } from '@mui/styles'
 import auth from './../auth/auth-helper'
 import {read, update} from './api-user.js'
-import {Redirect} from 'react-router-dom'
+import {Navigate, useParams} from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -50,8 +50,9 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-export default function EditProfile({ match }) {
+export default function EditProfile() {
   const classes = useStyles()
+  const { userId } = useParams()
   const [values, setValues] = useState({
     name: '',
     about: '',
@@ -69,7 +70,7 @@ export default function EditProfile({ match }) {
     const signal = abortController.signal
 
     read({
-      userId: match.params.userId
+      userId: userId
     }, {t: jwt.token}, signal).then((data) => {
       if (data & data.error) {
         setValues({...values, error: data.error})
@@ -81,7 +82,7 @@ export default function EditProfile({ match }) {
       abortController.abort()
     }
 
-  }, [match.params.userId])
+  }, [userId])
   
   const clickSubmit = () => {
     let userData = new FormData()
@@ -91,7 +92,7 @@ export default function EditProfile({ match }) {
     values.about && userData.append('about', values.about)
     values.photo && userData.append('photo', values.photo)
     update({
-      userId: match.params.userId
+      userId: userId
     }, {
       t: jwt.token
     }, userData).then((data) => {
@@ -113,7 +114,7 @@ export default function EditProfile({ match }) {
                  ? `/api/users/photo/${values.id}?${new Date().getTime()}`
                  : '/api/users/defaultphoto'
     if (values.redirectToProfile) {
-      return (<Redirect to={'/user/' + values.id}/>)
+      return (<Navigate to={'/user/' + values.id}/>)
     }
     return (
       <Card className={classes.card}>
