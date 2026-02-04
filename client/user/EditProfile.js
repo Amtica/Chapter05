@@ -72,7 +72,7 @@ export default function EditProfile() {
     read({
       userId: userId
     }, {t: jwt.token}, signal).then((data) => {
-      if (data & data.error) {
+      if (data && data.error) {
         setValues({...values, error: data.error})
       } else {
         setValues({...values, id: data._id, name: data.name, email: data.email, about: data.about})
