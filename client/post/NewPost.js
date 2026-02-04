@@ -13,7 +13,7 @@ import PropTypes from 'prop-types'
 import {makeStyles} from '@mui/styles'
 import {create} from './api-post.js'
 import IconButton from '@mui/material/IconButton'
-import PhotoCamera from '@material-ui/icons/PhotoCamera'
+import PhotoCamera from '@mui/icons-material/PhotoCamera'
 
 const useStyles = makeStyles(theme => ({
   root: {

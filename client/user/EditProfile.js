@@ -122,15 +122,15 @@ export default function EditProfile() {
           <Typography variant="h6" className={classes.title}>
             Edit Profile
           </Typography>
-          <Avatar src={photoUrl} className={classes.bigAvatar}/ replace /><br/ replace />
-          <input accept="image/*" onChange={handleChange('photo')} className={classes.input} id="icon-button-file" type="file" / replace />
+          <Avatar src={photoUrl} className={classes.bigAvatar}/><br/>
+          <input accept="image/*" onChange={handleChange('photo')} className={classes.input} id="icon-button-file" type="file" />
           <label htmlFor="icon-button-file">
             <Button variant="contained" color="default" component="span">
               Upload
-              <FileUpload/ replace />
+              <FileUpload/>
             </Button>
-          </label> <span className={classes.filename}>{values.photo ? values.photo.name : ''}</span><br/ replace />
-          <TextField id="name" label="Name" className={classes.textField} value={values.name} onChange={handleChange('name')} margin="normal"/ replace /><br/ replace />
+          </label> <span className={classes.filename}>{values.photo ? values.photo.name : ''}</span><br/>
+          <TextField id="name" label="Name" className={classes.textField} value={values.name} onChange={handleChange('name')} margin="normal"/><br/>
           <TextField
             id="multiline-flexible"
             label="About"
@@ -140,10 +140,10 @@ export default function EditProfile() {
             onChange={handleChange('about')}
             className={classes.textField}
             margin="normal"
-          / replace /><br/ replace />
-          <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal"/ replace /><br/ replace />
-          <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal"/ replace />
-          <br/ replace /> {
+          /><br/>
+          <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal"/><br/>
+          <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal"/>
+          <br/> {
             values.error && (<Typography component="p" color="error">
               <Icon color="error" className={classes.error}>error</Icon>
               {values.error}
