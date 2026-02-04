@@ -14,10 +14,13 @@ import postRoutes from './routes/post.routes'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import MainRouter from './../client/MainRouter'
-import { StaticRouter } from 'react-router-dom'
+import { StaticRouter } from 'react-router-dom/server'
 
-import { ServerStyleSheets, ThemeProvider } from '@material-ui/styles'
+import createEmotionServer from '@emotion/server/create-instance'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
 import theme from './../client/theme'
+import createEmotionCache from './../client/createEmotionCache'
 //end
 
 //comment out before building for production
@@ -47,25 +50,27 @@ app.use('/', authRoutes)
 app.use('/', postRoutes)
 
 app.get('*', (req, res) => {
-  const sheets = new ServerStyleSheets()
+  const cache = createEmotionCache()
+  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache)
 
   const context = {}
   const markup = ReactDOMServer.renderToString(
-      sheets.collect(
         <StaticRouter location={req.url} context={context}>
           <ThemeProvider theme={theme}>
+            <CssBaseline />
             <MainRouter />
           </ThemeProvider>
         </StaticRouter>
-      )
     )
     if (context.url) {
       return res.redirect(303, context.url)
     }
-    const css = sheets.toString()
+    const emotionChunks = extractCriticalToChunks(markup)
+    const emotionCss = constructStyleTagsFromChunks(emotionChunks)
+    
     res.status(200).send(Template({
       markup: markup,
-      css: css
+      css: emotionCss
     }))
 })
 
