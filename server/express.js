@@ -66,7 +66,7 @@ app.get('*', (req, res) => {
     </CacheProvider>
   )
 
-  // First render to string to extract critical CSS
+  // Render to string to extract critical CSS
   const html = ReactDOMServer.renderToString(AppComponent)
   
   if (context.url) {
@@ -76,28 +76,11 @@ app.get('*', (req, res) => {
   const chunks = extractCriticalToChunks(html)
   const css = constructStyleTagsFromChunks(chunks)
 
-  // Now use React 18 streaming
-  const { renderToPipeableStream } = ReactDOMServer
-  const stream = renderToPipeableStream(AppComponent, {
-    onShellReady() {
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'text/html')
-      const templateStart = Template({ markup: '', css }).split('<div id="root">')[0] + '<div id="root">'
-      res.write(templateStart)
-      stream.pipe(res, { end: false })
-    },
-    onAllReady() {
-      const templateEnd = Template({ markup: '', css }).split('</div>')[1]
-      res.write('</div>')
-      res.write(templateEnd)
-      res.end()
-    },
-    onError(err) {
-      console.error('SSR error:', err)
-      res.statusCode = 500
-      res.end()
-    }
-  })
+  // Send the complete HTML response
+  res.status(200).send(Template({
+    markup: html,
+    css: css
+  }))
 })
 
 // Catch unauthorised errors
