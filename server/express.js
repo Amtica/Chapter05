@@ -1,11 +1,11 @@
 import express from 'express'
 import path from 'path'
-import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import compress from 'compression'
 import cors from 'cors'
 import helmet from 'helmet'
 import Template from './../template'
+import config from './../config/config'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
 import postRoutes from './routes/post.routes'
@@ -14,9 +14,13 @@ import postRoutes from './routes/post.routes'
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import MainRouter from './../client/MainRouter'
-import { StaticRouter } from 'react-router-dom'
+import { StaticRouter } from 'react-router-dom/server'
 
-import { ServerStyleSheets, ThemeProvider } from '@material-ui/styles'
+import { ThemeProvider } from '@mui/material/styles'
+import CssBaseline from '@mui/material/CssBaseline'
+import { CacheProvider } from '@emotion/react'
+import createCache from '@emotion/cache'
+import createEmotionServer from '@emotion/server/create-instance'
 import theme from './../client/theme'
 //end
 
@@ -29,13 +33,23 @@ const app = express()
 //comment out before building for production
 devBundle.compile(app)
 
-// parse body params and attache them to req.body
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+// parse body params and attach them to req.body
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(compress())
 // secure apps by setting various HTTP headers
-app.use(helmet())
+if (config.env === 'development') {
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        scriptSrc: ["'self'", "'unsafe-eval'"]
+      }
+    }
+  }))
+} else {
+  app.use(helmet())
+}
 // enable CORS - Cross Origin Resource Sharing
 app.use(cors())
 
@@ -46,34 +60,45 @@ app.use('/', userRoutes)
 app.use('/', authRoutes)
 app.use('/', postRoutes)
 
-app.get('*', (req, res) => {
-  const sheets = new ServerStyleSheets()
-
+app.use((req, res) => {
+  const cache = createCache({ key: 'css', prepend: true })
+  const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache)
+  
   const context = {}
-  const markup = ReactDOMServer.renderToString(
-      sheets.collect(
-        <StaticRouter location={req.url} context={context}>
-          <ThemeProvider theme={theme}>
-            <MainRouter />
-          </ThemeProvider>
-        </StaticRouter>
-      )
-    )
-    if (context.url) {
-      return res.redirect(303, context.url)
-    }
-    const css = sheets.toString()
-    res.status(200).send(Template({
-      markup: markup,
-      css: css
-    }))
+  
+  const AppComponent = (
+    <CacheProvider value={cache}>
+      <StaticRouter location={req.url} context={context}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <MainRouter />
+        </ThemeProvider>
+      </StaticRouter>
+    </CacheProvider>
+  )
+
+  // Render to string to extract critical CSS
+  const html = ReactDOMServer.renderToString(AppComponent)
+  
+  if (context.url) {
+    return res.redirect(303, context.url)
+  }
+  
+  const chunks = extractCriticalToChunks(html)
+  const css = constructStyleTagsFromChunks(chunks)
+
+  // Send the complete HTML response
+  res.status(200).send(Template({
+    markup: html,
+    css: css
+  }))
 })
 
 // Catch unauthorised errors
 app.use((err, req, res, next) => {
   if (err.name === 'UnauthorizedError') {
     res.status(401).json({"error" : err.name + ": " + err.message})
-  }else if (err) {
+  } else if (err) {
     res.status(400).json({"error" : err.name + ": " + err.message})
     console.log(err)
   }

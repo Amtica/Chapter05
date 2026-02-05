@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 const CURRENT_WORKING_DIR = process.cwd()
 
 const config = {
@@ -13,7 +14,8 @@ const config = {
     output: {
         path: path.join(CURRENT_WORKING_DIR , '/dist'),
         filename: 'bundle.js',
-        publicPath: '/dist/'
+        publicPath: '/dist/',
+        hashFunction: 'xxhash64'
     },
     module: {
         rules: [
@@ -21,24 +23,29 @@ const config = {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
                 use: [
-                    'babel-loader'
+                    {
+                        loader: 'babel-loader',
+                        options: {
+                            envName: 'development-client'
+                        }
+                    }
                 ]
             },
             {
                 test: /\.(ttf|eot|svg|gif|jpg|png)(\?[\s\S]+)?$/,
-                use: 'file-loader'
+                type: 'asset/resource',
+                generator: {
+                    filename: '[name][ext]'
+                }
             }
         ]
     },  
     plugins: [
           new webpack.HotModuleReplacementPlugin(),
-          new webpack.NoEmitOnErrorsPlugin()
-    ],
-    resolve: {
-        alias: {
-          'react-dom': '@hot-loader/react-dom'
-        }
-    }
+          new ReactRefreshWebpackPlugin({
+              overlay: false
+          })
+    ]
 }
 
 module.exports = config

@@ -1,30 +1,13 @@
 import React, {useState, useEffect} from 'react'
-import {makeStyles} from '@material-ui/core/styles'
-import Card from '@material-ui/core/Card'
-import Typography from '@material-ui/core/Typography'
-import Divider from '@material-ui/core/Divider'
+import Card from '@mui/material/Card'
+import Typography from '@mui/material/Typography'
+import Divider from '@mui/material/Divider'
 import auth from './../auth/auth-helper'
 import PostList from './PostList'
 import {listNewsFeed} from './api-post.js'
 import NewPost from './NewPost'
 
-const useStyles = makeStyles(theme => ({
-  card: {
-    margin: 'auto',
-    paddingTop: 0,
-    paddingBottom: theme.spacing(3)
-  },
-  title: {
-    padding:`${theme.spacing(3)}px ${theme.spacing(2.5)}px ${theme.spacing(2)}px`,
-    color: theme.palette.openTitle,
-    fontSize: '1em'
-  },
-  media: {
-    minHeight: 330
-  }
-}))
 export default function Newsfeed () {
-  const classes = useStyles()
   const [posts, setPosts] = useState([])
   const jwt = auth.isAuthenticated()
 
@@ -62,8 +45,8 @@ export default function Newsfeed () {
   }
 
     return (
-      <Card className={classes.card}>
-        <Typography type="title" className={classes.title}>
+      <Card sx={{ margin: 'auto', paddingTop: 0, paddingBottom: 3 }}>
+        <Typography type="title" sx={{ padding: '24px 20px 16px', color: 'primary.main', fontSize: '1em' }}>
           Newsfeed
         </Typography>
         <Divider/>
